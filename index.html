@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator</title>
+</head>
+<style>
+body{
+    background-image: url(./calculator.webp);
+    background-repeat: no-repeat;
+    background-position: 28% 49%;
+    transform: skewX(10deg);
+}
+</style>
+<body>
+    <script>
+        const calculator = document.createElement('div');
+        calculator.style.cssText = 
+                    `width : 260px;
+                    border : 1px solid #ccc;
+                    borderRadius : 8px;
+                    boxShadow : 0 0 10px rgba(0, 0, 0, 0.1);
+                    padding : 20px;
+                    background : rgb(130 132 143);
+                    fontFamily : Arial, sans-serif;
+                         border-radius: 20px;
+                    margin : 100px auto`;
+
+        const display = document.createElement('input');
+        display.style.cssText = `
+                    width: 100%;
+                    padding: 10px 0px;
+                    font-size: 1.5em;
+                    text-align: right;
+                    border: 1px solid #ccc;
+                    border-radius: 4px;
+                    margin-bottom: 10px;
+                    border-radius: 6px;
+                    text-align:center;
+                `;
+
+
+        calculator.appendChild(display);
+
+        const buttons = [
+            ['C', '/', '*', '-'],
+            ['7', '8', '9', '+'],
+            ['4', '5', '6', '='],
+            ['1', '2', '3', '0', '.']
+        ];
+
+        const buttonContainer = document.createElement('div');
+        buttonContainer.style.display = 'grid';
+        buttonContainer.style.gridTemplateColumns = 'repeat(4, 1fr)';
+        buttonContainer.style.gap = '3px';
+        calculator.appendChild(buttonContainer);
+
+        buttons.forEach(row => {
+            row.forEach(buttonText => {
+                const button = document.createElement('div');
+                button.textContent = buttonText;                
+                button.style.padding = '20px';
+                button.style.fontSize = '1.2em';
+                button.style.border = '1px solid #ccc';
+                button.style.borderRadius = '6px';
+                button.style.background = '#f9f9f9';
+                button.style.textAlign = 'center';
+                button.style.cursor = 'pointer';
+                button.style.userSelect = 'none';
+                button.style.boxSizing = 'border-box';
+
+                button.style.transition = 'background 0.3s ease, box-shadow 0.3s ease';
+                button.addEventListener('mouseover', () => {
+                    button.style.background = '#e0e0e0';
+                    button.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
+                });
+                button.addEventListener('mouseout', () => {
+                    button.style.background = '#f9f9f9';
+                    button.style.boxShadow = 'none';
+                });
+                button.addEventListener('click', () => handleButtonClick(buttonText));
+                buttonContainer.appendChild(button);
+            });
+        });
+        let currentInput = '';
+        let operator = '';
+        let previousInput = '';
+        function handleButtonClick(value) {
+            if (value >= '0' && value <= '9' || value === '.') {
+                handleNumber(value);
+            } else if (value === 'C') {
+                clear();
+            } else if (value === '=') {
+                calculate();
+            } else {
+                handleOperator(value);
+            }
+        }
+        function handleNumber(value) {
+            if (value === '.' && currentInput.includes('.')) return;
+            currentInput += value;
+            updateDisplay();
+        }
+        function handleOperator(value) {
+            if (currentInput === '') return;
+            if (previousInput !== '') {
+                calculate();
+            }
+            operator = value;
+            previousInput = currentInput;
+            currentInput = '';
+            updateDisplay();
+        }
+        function calculate() {
+            const prev = parseFloat(previousInput);
+            const current = parseFloat(currentInput);
+            let result;
+            switch (operator) {
+                case '+':
+                    result = prev + current;
+                    break;
+                case '-':
+                    result = prev - current;
+                    break;
+                case '*':
+                    result = prev * current;
+                    break;
+                case '/':
+                    result = prev / current;
+                    break;
+                default:
+                    return;
+            }
+            currentInput = result.toString();
+            operator = '';
+            previousInput = '';
+            updateDisplay();
+        }
+        function clear() {
+            currentInput = '';
+            operator = '';
+            previousInput = '';
+            updateDisplay();
+        }
+        function updateDisplay() {
+            display.value = previousInput.toString() + operator.toString() + currentInput.toString();
+        }
+
+        document.body.appendChild(calculator);
+
+        document.addEventListener('keydown', (event) => {
+            const key = event.key;
+
+            if (key >= '0' && key <= '9') {
+                handleNumber(key);
+            } else if (key === '.') {
+                handleNumber(key);
+            }
+
+            else if (key === '/' || key === '*' || key === '-' || key === '+') {
+                handleOperator(key);
+            }
+            else if (key === 'Enter') {
+                calculate();
+            }
+            else if (key.toUpperCase() === 'C') {
+                clear();
+            }
+        });
+
+    </script>
+
+</body>
+
+</html>
